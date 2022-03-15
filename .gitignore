@@ -1,0 +1,5 @@
+/provider/cmd/pulumi-resource-*/schema.go
+/sdk/
+.task
+/bin
+**/node_modules

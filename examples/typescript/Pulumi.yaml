@@ -1,0 +1,4 @@
+name: ssp-fargate
+runtime: nodejs
+description: SSP Example with Fargate
+main: src/index.ts

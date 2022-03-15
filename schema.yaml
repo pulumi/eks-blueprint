@@ -1,0 +1,162 @@
+---
+name: ssp
+
+resources:
+  ssp:index:SharedServicesPlatform:
+    isComponent: true
+    inputProperties:
+      clusterArgs:
+        $ref: "#types/ssp:index:ClusterArgs"
+    requiredInputs:
+      - clusterArgs
+    properties:
+      kubeconfig:
+        type: string
+    required:
+      - kubeconfig
+
+    methods:
+      addManagedNodeGroup: ssp:index:SharedServicesPlatform/addManagedNodeGroup
+      # addFargateProfile: ssp:index:SharedServicesPlatform/addFargateProfile
+      clusterAddon: ssp:index:SharedServicesPlatform/clusterAddon
+      onboardTeam: ssp:index:SharedServicesPlatform/onboardTeam
+
+types:
+  ssp:index:ClusterArgs:
+    type: object
+    properties:
+      region:
+        type: string
+      kubernetesVersion:
+        type: string
+      encryptionConfig:
+        type: string
+      tags:
+        type: object
+        additionalProperties:
+          type: string
+      # fargateProfiles:
+      #   type: array
+      #   items:
+      #     $ref: "/aws/v4.37.4/schema.json#/resources/aws:eks/fargateProfile:FargateProfile"
+    required:
+      - region
+      - kubernetesVersion
+
+functions:
+  ssp:index:SharedServicesPlatform/addManagedNodeGroup:
+    description: Cool
+    inputs:
+      properties:
+        __self__:
+          $ref: "#/resources/ssp:index:SharedServicesPlatform"
+        name:
+          type: string
+          plain: true
+        instanceTypes:
+          type: array
+          items:
+            type: string
+        minSize:
+          type: integer
+        maxSize:
+          type: integer
+        desiredSize:
+          type: integer
+        kubernetesVersion:
+          type: string
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - __self__
+        - name
+        - instanceTypes
+        - minSize
+        - maxSize
+        - desiredSize
+
+  # ssp:index:SharedServicesPlatform/addFargateProfile:
+  #   description: Cool
+  #   inputs:
+  #     properties:
+  #       __self__:
+  #         $ref: "#/resources/ssp:index:SharedServicesPlatform"
+  #       name:
+  #         type: string
+  #         plain: true
+  #       selectors:
+  #         type: array
+  #         items:
+  #           $ref: "/aws/v4.37.4/schema.json#/types/aws:eks%2FFargateProfileArgs:FargateProfileArgs"
+  #     required:
+  #       - __self__
+  #       - name
+  #       - selectors
+
+  ssp:index:SharedServicesPlatform/onboardTeam:
+    description: Cool
+    inputs:
+      properties:
+        __self__:
+          $ref: "#/resources/ssp:index:SharedServicesPlatform"
+        name:
+          type: string
+          plain: true
+        repository:
+          type: string
+        controller:
+          type: string
+          enum:
+            - value: argocd
+            - value: flux
+            - value: pulumi
+
+      required:
+        - __self__
+        - name
+        - repository
+        - controller
+
+  ssp:index:SharedServicesPlatform/clusterAddon:
+    inputs:
+      properties:
+        __self__:
+          $ref: "#/resources/ssp:index:SharedServicesPlatform"
+        name:
+          type: string
+          enum:
+            - value: argocd
+            - value: metrics-server
+        version:
+          type: string
+      required:
+        - __self__
+        - name
+
+language:
+  csharp:
+    packageReferences:
+      Pulumi: 3.*
+      Pulumi.Aws: 4.*
+      Pulumi.Eks: 0.37.*
+      Pulumi.Kubernetes: 3.*
+    namespaces:
+      ssp: Ssp
+  go:
+    generateResourceContainerTypes: true
+    importBasePath: github.com/pulumi/pulumi-ssp/sdk/go/ssp
+  nodejs:
+    dependencies:
+      "@pulumi/aws": "^4"
+      "@pulumi/eks": "^0.37.1"
+      "@pulumi/kubernetes": "^3"
+    devDependencies:
+      typescript: "^3.7.0"
+  python:
+    requires:
+      pulumi: ">=3.0.0,<4.0.0"
+      pulumi-aws: ">=4.0.0,<5.0.0"
+      pulumi-eks: ">=0.37.1"
+      pulumi-kubernetes: ">=3.0.0,<4.0.0"

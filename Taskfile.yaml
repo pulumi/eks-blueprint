@@ -1,0 +1,83 @@
+version: "3"
+
+vars:
+  version:
+    sh: pulumictl get version
+  pack: ssp
+  provider: pulumi-resource-{{ .pack }}
+  project: github.com/pulumi/pulumi-{{ .pack }}
+  codegen: pulumi-gen-{{ .pack }}
+  workingDir:
+    sh: pwd
+  versionPath: provider/pkg/version.Version
+  schemaPath: "{{ .workingDir }}/schema.yaml"
+  goPath:
+    sh: go env GOPATH
+
+tasks:
+  provider:clean:
+    - rm -f ./bin/{{ .provider }} {{ .goPath }}/bin/{{ .provider }}
+
+  provider:build:
+    dir: ./provider
+    sources:
+      - ./**/*
+    generates:
+      - "{{ .workingDir }}/bin/{{ .provider }}"
+    env:
+      VERSION: "{{ .version }}"
+      SCHEMA: "{{ .schemaPath }}"
+    cmds:
+      - go generate ./cmd/{{ .provider}}/main.go
+      - go build -a -o {{ .workingDir }}/bin/{{ .provider }} -ldflags "-X {{ .project }}/{{ .versionPath }}={{ .version }}" ./cmd/{{ .provider }}
+
+  provider:install:
+    deps:
+      - provider:clean
+      - provider:build
+    cmds:
+      - cp {{ .workingDir }}/bin/{{ .provider }} {{ .goPath }}/bin
+
+  sdk:go:
+    - task: sdk:clean
+      vars: { sdk: go }
+    - task: sdk:generate
+      vars: { sdk: go }
+
+  sdk:nodejs:
+    - task: sdk:clean
+      vars: { sdk: nodejs }
+    - task: sdk:generate
+      vars: { sdk: nodejs }
+    - task: sdk:nodejs:complete
+    - task: sdk:nodejs:link
+
+  sdk:python:
+    - task: sdk:clean
+      vars: { sdk: python }
+    - task: sdk:generate
+      vars: { sdk: python }
+
+  sdk:nodejs:complete:
+    dir: "{{ .workingDir }}/sdk/nodejs"
+    cmds:
+      - yarn install
+      - yarn run tsc
+      - mkdir -p ./bin
+      - cp {{ .workingDir }}/README.md {{ .workingDir }}/LICENSE package.json yarn.lock ./bin/
+      - sed -i.bak -e "s/\${VERSION}/{{ .version }}/g" ./bin/package.json
+      - rm ./bin/package.json.bak
+
+  sdk:nodejs:link:
+    dir: "{{ .workingDir }}/sdk/nodejs"
+    cmds:
+      - yarn unlink {{ .pack }} || true
+      - yarn link --cwd ./bin
+
+  sdk:clean:
+    - rm -rf {{ .workingDir }}/sdk/{{ .sdk }}
+
+  sdk:generate:
+    dir: "{{ .workingDir }}/provider/cmd/{{ .codegen }}"
+    cmds:
+      - go run . {{ .sdk }} ../../../sdk/{{ .sdk }} {{ .schemaPath }}
