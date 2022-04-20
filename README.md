@@ -1,14 +1,14 @@
-# Pulumi EKS Blueprints
+# EKS Blueprints for Pulumi
 
 Amazon EKS Blueprints for Pulumi are a set of useful components for simplifying common day zero through day two operations for Kubernetes.
 
-**Warning**: This is an early preview of the Pulumi EKS Blueprints. The APIs and functionality are subject to change.
+**Note**: This is a preview of EKS Blueprints concepts and examples. The APIs and functionality are subject to change.
 
 ## How to use these
 
-We don't recommend using these blueprints directly, as a dependency. Instead, these should be forked and considered your "platform" repository of which you can build upon these abstractions and components.
+During the preview we expect to ship improvements and changes rapidly. We recommend forking these blueprints instead of using them as a direct dependency. Consider this your "platform" repository which you can build upon these abstractions and components. 
 
-As we mature and stablise the API, these can be consumed as a dependency.
+As we mature and stablize the API, these can be consumed as a dependency.
 
 ## What's Next?
 
@@ -23,6 +23,7 @@ As we mature and stablise the API, these can be consumed as a dependency.
 - More Team Controls
   - [ ] Quotas
   - [ ] Refined RBAC
+- Multi-language Packages
 
 ## Questions?
 
