@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "devDependencies": {
-    "@pulumi/pulumi": "^3.22.1",
+    "@pulumi/pulumi": "^3.73.0",
     "@pulumi/aws": "^4",
     "@pulumi/eks": "^0.36"
   }
